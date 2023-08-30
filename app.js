@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+var mime = require('mime');
 const multer = require("multer");
 
 // configuration step
@@ -8,20 +9,25 @@ dotenv.config();
 const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
 const {
-    uploadToS3
+    uploadToS3,
+    getFileS3
 } = require("./s3");
 
 // controller
 const app = express();
 
-app.post("/image", upload.single("image"), async (req, res, next) => {
+app.post("/file", upload.single("file"), async (req, res, next) => {
     const file = req.file;
-    console.log(file);
     const result = await uploadToS3(file);
-    console.log(result);
-    res.send("ok");
+    let url = "http://localhost:8080/file/" + result;
+    res.send(url);
 })
 
+app.get("/file/:filename",async (req, res, next) => {
+    const result = await getFileS3(req.params.filename);
+    res.setHeader('Content-disposition', 'attachment; filename=' + req.params.filename);
+    result.Body.pipe(res);
+})
 
 
 app.listen(PORT, () => {

@@ -1,4 +1,4 @@
-const {S3, PutObjectCommand} = require('@aws-sdk/client-s3');
+const {S3, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 require("dotenv").config();
 const fs = require("fs");
 const bucketName = process.env.AWS_BUCKET_NAME;
@@ -15,24 +15,33 @@ const s3 = new S3({
 })
 
 //upload
-function uploadToS3(file) {
+async function uploadToS3(file) {
     let fileNameArr = file.originalname.split(".");
-
+    const filename = fileNameArr[0] + Date.now() + Math.floor(Math.random()*1000) + "." +fileNameArr[1];
     const uploadParams = {
         Bucket: bucketName,
-        Key: fileNameArr[0] + Date.now() + Math.floor(Math.random()*1000) + "." +fileNameArr[1],
+        Key: filename,
         Body: file.buffer,
         ContentType: file.mimetype
     }
     let command = new PutObjectCommand(uploadParams);
-    return s3.send(command);
+    await s3.send(command);
+    return filename;
 }
 
 
 //download
-
+function getFileS3(filename) {
+    const getParams = {
+        Bucket: bucketName,
+        Key: filename
+    }
+    const command = new GetObjectCommand(getParams);
+    return s3.send(command);
+}
 
 
 module.exports = {
-    uploadToS3
+    uploadToS3,
+    getFileS3
 }
