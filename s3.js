@@ -1,4 +1,8 @@
-const {S3, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const {S3, 
+    PutObjectCommand, 
+    GetObjectCommand,
+    DeleteObjectCommand
+} = require('@aws-sdk/client-s3');
 require("dotenv").config();
 const fs = require("fs");
 const bucketName = process.env.AWS_BUCKET_NAME;
@@ -14,8 +18,8 @@ const s3 = new S3({
     region: bucketRegion
 })
 
-//upload
-async function uploadToS3(file) {
+// put object to s3
+async function uploadFileS3(file) {
     let fileNameArr = file.originalname.split(".");
     const filename = fileNameArr[0] + Date.now() + Math.floor(Math.random()*1000) + "." +fileNameArr[1];
     const uploadParams = {
@@ -30,7 +34,7 @@ async function uploadToS3(file) {
 }
 
 
-//download
+// get object from s3
 function getFileS3(filename) {
     const getParams = {
         Bucket: bucketName,
@@ -40,8 +44,18 @@ function getFileS3(filename) {
     return s3.send(command);
 }
 
+// delete object from s3
+function deleteFileS3(filename) {
+    const deleteParams = {
+        Bucket: bucketName,
+        Key: filename
+    }
+    const command = new DeleteObjectCommand(deleteParams);
+    return s3.send(command);
+}
 
 module.exports = {
-    uploadToS3,
-    getFileS3
+    uploadFileS3,
+    getFileS3,
+    deleteFileS3
 }
