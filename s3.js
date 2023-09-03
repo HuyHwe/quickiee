@@ -25,12 +25,31 @@ async function uploadFileS3(file) {
     const uploadParams = {
         Bucket: bucketName,
         Key: filename,
-        Body: file.buffer,
+        Body: fileNameArr[1] == "zip" ? file : file.buffer,
         ContentType: file.mimetype
     }
     let command = new PutObjectCommand(uploadParams);
     await s3.send(command);
     return filename;
+}
+
+async function uploadFilesS3(arr) {
+    sending = [];
+    const foldername = arr[0].originalname.split(".")[0] + Date.now();
+    arr.forEach(file => {
+        let fileNameArr = file.originalname.split(".");
+        let filename = fileNameArr[0] + Date.now() + Math.floor(Math.random()*1000) + "." +fileNameArr[1];
+        const uploadParams = {
+            Bucket: bucketName,
+            Key: foldername + "/" + filename,
+            Body: file.buffer,
+            ContentType: file.mimetype
+        }
+        let command = new PutObjectCommand(uploadParams);
+        sending.push(s3.send(command));
+    });
+    await Promise.all(sending);
+    return foldername;
 }
 
 
@@ -56,6 +75,7 @@ function deleteFileS3(filename) {
 
 module.exports = {
     uploadFileS3,
+    uploadFilesS3,
     getFileS3,
     deleteFileS3
 }
