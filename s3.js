@@ -1,7 +1,8 @@
 const {S3, 
     PutObjectCommand, 
     GetObjectCommand,
-    DeleteObjectCommand
+    DeleteObjectCommand,
+    ListObjectsV2Command
 } = require('@aws-sdk/client-s3');
 require("dotenv").config();
 const fs = require("fs");
@@ -33,6 +34,7 @@ async function uploadFileS3(file) {
     return filename;
 }
 
+// upload multiple files
 async function uploadFilesS3(arr) {
     sending = [];
     const foldername = arr[0].originalname.split(".")[0] + Date.now();
@@ -54,13 +56,19 @@ async function uploadFilesS3(arr) {
 
 
 // get object from s3
-function getFileS3(filename) {
+async function getFileS3(filename) {
     const getParams = {
         Bucket: bucketName,
         Key: filename
     }
     const command = new GetObjectCommand(getParams);
-    return s3.send(command);
+    try{
+        const result = await s3.send(command);
+        return result;
+    } catch (e) {
+        console.log(e);
+        return null;
+    }
 }
 
 // delete object from s3
@@ -73,9 +81,20 @@ function deleteFileS3(filename) {
     return s3.send(command);
 }
 
+// get keys name from s3
+function getFolderList(foldername) {
+    const listParams = {
+        Bucket: bucketName,
+        Prefix: foldername
+    }
+    const command = new ListObjectsV2Command(listParams);
+    return s3.send(command);
+}
+
 module.exports = {
     uploadFileS3,
     uploadFilesS3,
     getFileS3,
-    deleteFileS3
+    deleteFileS3,
+    getFolderList
 }

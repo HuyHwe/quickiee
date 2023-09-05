@@ -12,7 +12,8 @@ const {
     uploadFileS3,
     uploadFilesS3,
     getFileS3,
-    deleteFileS3
+    deleteFileS3,
+    getFolderList
 } = require("./s3");
 
 
@@ -39,17 +40,31 @@ app.post("/files", upload.array("files", 15), async (req, res, next) => {
     }, 900000);
     res.send(url);
     
-    
-
-
 })
 
 app.get("/file/:filename",async (req, res, next) => {
     const result = await getFileS3(req.params.filename);
-    res.setHeader('Content-disposition', 'attachment; filename=' + req.params.filename);
-    result.Body.pipe(res);
+    if (result == null) res.send(null);
+    else {
+        res.setHeader('Content-disposition', 'attachment; filename=' + req.params.filename);
+        result.Body.pipe(res);
+    }
 })
 
+app.get("/files/:foldername", async (req, res, next) => {
+    let results = [];
+    const foldername = req.params.foldername;
+    const folderList = (await getFolderList(foldername)).Contents;
+    folderList.forEach(item => {
+        results.push(getFileS3(item.Key).then(result => {
+            result.Body.on('data', chunk => res.write(chunk))
+        }));
+    });
+    await Promise.all(results);
+    res.end();
+    
+    
+})
 
 app.listen(PORT, () => {
     console.log("listening to port: " + PORT);
