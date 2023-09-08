@@ -62,13 +62,7 @@ async function getFileS3(filename) {
         Key: filename
     }
     const command = new GetObjectCommand(getParams);
-    try{
-        const result = await s3.send(command);
-        return result;
-    } catch (e) {
-        console.log(e);
-        return null;
-    }
+    return s3.send(command);
 }
 
 // delete object from s3
