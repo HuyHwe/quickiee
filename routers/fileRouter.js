@@ -19,7 +19,19 @@ fileRouter.post("/", upload.single("file"), async (req, res, next) => {
 
 fileRouter.get("/:filename",async (req, res, next) => {
     try {
+        console.log(req.params.filename);
         const result = await getFileS3(req.params.filename);
+        res.setHeader('Content-disposition', 'attachment; filename=' + req.params.filename);
+        result.Body.pipe(res);
+    } catch (e) {
+        next(e);
+    }
+});
+
+fileRouter.get("/:foldername/:filename",async (req, res, next) => {
+    try {
+        console.log(req.params.filename);
+        const result = await getFileS3(req.params.foldername + "/" + req.params.filename);
         res.setHeader('Content-disposition', 'attachment; filename=' + req.params.filename);
         result.Body.pipe(res);
     } catch (e) {

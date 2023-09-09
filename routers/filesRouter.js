@@ -24,13 +24,17 @@ filesRouter.post("/", upload.array("files", 15), async (req, res, next) => {
 filesRouter.get("/:foldername", async (req, res, next) => {
     let results = [];
     const foldername = req.params.foldername;
-    // try {
-        const folderList = (await getFolderList(foldername)).Contents;
-        console.log(folderList);
-        res.send(folderList);
-    // } catch (e) {
-    //     next(e);
-    // }
+    try {
+        let filesList = (await getFolderList(foldername)).Contents;
+        filesList = filesList.map(file => file.Key);
+        console.log(filesList);
+        res.render("files", {data: {
+            filesList,
+            baseUrl: "http://localhost:8080/file/"
+        }})
+    } catch (e) {
+        next(e);
+    }
 })
 
 module.exports = filesRouter;
