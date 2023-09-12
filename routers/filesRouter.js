@@ -28,7 +28,7 @@ filesRouter.get("/:foldername", async (req, res, next) => {
         let filesList = (await getFolderList(foldername)).Contents;
         filesList = filesList.map(file => file.Key);
         console.log(filesList);
-        res.render("files", {data: {
+        res.render("download", {data: {
             filesList,
             baseUrl: "http://localhost:8080/file/"
         }})
