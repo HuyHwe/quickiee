@@ -37,13 +37,13 @@ async function uploadFileS3(file) {
 // upload multiple files
 async function uploadFilesS3(arr) {
     sending = [];
-    const foldername = arr[0].originalname.split(".")[0] + Date.now();
+    let foldername = arr[0].originalname.split(".")[0] + Date.now();
     arr.forEach(file => {
         let fileNameArr = file.originalname.split(".");
         let filename = fileNameArr[0] + Date.now() + Math.floor(Math.random()*1000) + "." +fileNameArr[1];
         const uploadParams = {
             Bucket: bucketName,
-            Key: foldername + "/" + filename,
+            Key: arr.length > 1 ? foldername + "/" + filename : foldername += '.' + arr[0].originalname.split(".")[1],
             Body: file.buffer,
             ContentType: file.mimetype
         }
@@ -55,7 +55,7 @@ async function uploadFilesS3(arr) {
 }
 
 
-// get object from s3
+// get single file from s3
 async function getFileS3(filename) {
     const getParams = {
         Bucket: bucketName,
@@ -65,7 +65,7 @@ async function getFileS3(filename) {
     return s3.send(command);
 }
 
-// delete object from s3
+// delete single file from s3
 function deleteFileS3(filename) {
     const deleteParams = {
         Bucket: bucketName,
@@ -75,14 +75,20 @@ function deleteFileS3(filename) {
     return s3.send(command);
 }
 
-// get keys name from s3
-function getFolderList(foldername) {
+// get files keys list from s3
+function getFilesList(foldername) {
     const listParams = {
         Bucket: bucketName,
         Prefix: foldername
     }
     const command = new ListObjectsV2Command(listParams);
-    return s3.send(command);
+    return s3.send(command).then(result => {
+        let filesList = result.Contents;
+        console.log(filesList);
+        filesList = filesList.map(file => file.Key);
+        console.log(filesList);
+        return filesList;
+    })
 }
 
 module.exports = {
@@ -90,5 +96,5 @@ module.exports = {
     uploadFilesS3,
     getFileS3,
     deleteFileS3,
-    getFolderList
+    getFilesList
 }

@@ -5,7 +5,7 @@ const {
     uploadFileS3,
     deleteFileS3,
     uploadFilesS3,
-    getFolderList
+    getFilesList
 } = require("../s3");
 
 
@@ -13,30 +13,15 @@ const {
 
 uploadRouter.post("/", upload.array("files", 15), async (req, res, next) => {
     const files = req.files;
-    try{
-        if (files.length == 1) {
-            let file = files[0];
-            const filename = await uploadFileS3(file);
-            let url = "http://localhost:8080/download/file/" + filename;
-            setTimeout(() => {
-                deleteFileS3(filename);
-            }, 900000);
-            res.send(url);
-        } else {
-            const foldername = await uploadFilesS3(files);
-            let url = "http://localhost:8080/download/folder/" + foldername;
-            const folderList = (await getFolderList(foldername)).Contents;
-            folderList.forEach(file => {
-                setTimeout(() => {
-                    deleteFileS3(file);
-                }, 900000);
-            })
-            res.send(url);
-        }
-    } catch (e) {
-        next(e);
-    }
-    
+    const name = await uploadFilesS3(files);
+    let url = files.length > 1 ? "http://localhost:8080/download/folder/" + name : "http://localhost:808download/file/" + name;
+    const filesList = files.length > 1 ? await getFilesList(name) : [name];
+    filesList.forEach(file => {
+        setTimeout(() => {
+            deleteFileS3(file);
+        }, 900000);
+    })
+    res.send(url);
 })
 
 module.exports = uploadRouter;

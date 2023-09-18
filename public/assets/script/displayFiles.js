@@ -1,13 +1,16 @@
 let inp = document.getElementById('files');
 let uploadList = document.getElementById('item-list');
 let uploadForm = document.getElementById("upload-form");
-let submit = document.getElementById("submit");
+let submit = document.getElementById("share-file");
+let titleSection = document.getElementById("info3-6");
 inp.onchange = () => {
     let filesString = "";
     if (inp.files.length > 0) {
         submit.style.display = "";
+        titleSection.style.paddingBottom = 0;
     } else {
         submit.style.display = "none";
+        titleSection.style.paddingBottom = "6rem";
     }
     for (let i = 0; i < inp.files.length; i++) {
         filesString += `<div class="item features-image сol-12 col-md-6 col-lg-4">

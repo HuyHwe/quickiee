@@ -3,7 +3,7 @@ const downloadRouter = express.Router();
 const upload = require("../multerConfig");
 const {
     getFileS3,
-    getFolderList
+    getFilesList
 } = require("../s3");
 
 downloadRouter.get("/file/:filename",async (req, res, next) => {
@@ -30,8 +30,7 @@ downloadRouter.get("/folder/:foldername", async (req, res, next) => {
     let results = [];
     const foldername = req.params.foldername;
     try {
-        let filesList = (await getFolderList(foldername)).Contents;
-        filesList = filesList.map(file => file.Key);
+        const filesList = await getFilesList(foldername);
         res.render("download", {data: {
             filesList,
             baseUrl: "http://localhost:8080/download/folder/"
