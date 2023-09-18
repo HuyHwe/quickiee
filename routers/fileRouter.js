@@ -7,9 +7,7 @@ const {
     deleteFileS3,
 } = require("../s3");
 
-fileRouter.get("/", (req, res, next) => {
-    res.render("upload");
-})
+
 
 fileRouter.post("/", upload.single("file"), async (req, res, next) => {
     const file = req.file;

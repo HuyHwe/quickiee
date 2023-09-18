@@ -74,10 +74,12 @@
                     <div class="card-box align-center">
                         <h4 class="card-title mbr-fonts-style align-center mb-4 display-1"><strong>Share your files</strong></h4>
                         <p class="mbr-text mbr-fonts-style mb-4 display-7">Just upload and we will create a link and a QR for you in a sec!</p>
-                        <form action="/" method="post" >
-                            <label for="upload-file" class="btn btn-warning display-4" >Upload</label>
-                            <div class="mbr-section-btn mt-3"><input style="display: none;" id="upload-file" type="file" value="Upload" name="fileList" multiple class="btn btn-warning display-4" href="https://mobiri.se"></div>
+                        <form action="/upload" method="post" enctype="multipart/form-data" id="upload-form">
+                            <label for="files" class="btn btn-warning display-4" >Upload!</label>
+                            <input id="files" type="file" name="files" multiple style="display: none;" class="btn btn-warning display-4">
+                            <div class="btn btn-warning display-4" id="submit" style="display: none; margin-top: 1rem;;"><input id="share-file" type="submit" value="Share now" multiple class="btn"></div>
                         </form>
+                        
                     </div>
                 </div>
             </div>

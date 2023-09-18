@@ -9,6 +9,9 @@ const {
 
 filesRouter.post("/", upload.array("files", 15), async (req, res, next) => {
     const files = req.files;
+    if (files.length == 1) {
+        
+    }
     const foldername = await uploadFilesS3(files);
     let url = "http://localhost:8080/files/" + foldername;
     const folderList = (await getFolderList(foldername)).Contents;
