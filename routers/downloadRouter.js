@@ -36,7 +36,7 @@ downloadRouter.get("/folder/:foldername", async (req, res, next) => {
         const filesList = await getFilesList(foldername);
         res.render("download", {data: {
             filesList,
-            baseUrl: baseUrl + "/download/folder/"
+            baseUrl: baseUrl + "download/folder/"
         }})
     } catch (e) {
         next(e);
